@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  all-in-api:
+    container_name: all-in-api-prod
+    image: all-in-api-prod:latest
+    networks:
+      - proxy
+    volumes:
+      - ./build:/app/build
+    build:
+      context: .
+      target: production
+
+networks:
+  proxy:
+    name: proxy
