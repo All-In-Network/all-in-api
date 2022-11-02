@@ -2,7 +2,7 @@ const WebSocketServer = require("websocket").server;
 const WebSocketClient = require("websocket").client;
 const http = require("http");
 
-const httpServerPort = 8080;
+const httpServerPort = process.env.HTTP_SERVER_PORT;
 const httpServer = http.createServer((request, response) => {
     console.log(`${new Date()} Received request for ${request.url}`);
     response.writeHead(404);
@@ -25,7 +25,7 @@ const wsServer = new WebSocketServer({
 });
 
 const alpacaClient = new WebSocketClient();
-const alpacaWssUrl = "wss://stream.data.alpaca.markets/v1beta2/crypto";
+const alpacaWssUrl = process.env.ALPACA_WSS_URL;
 
 function alpacaSubscribe(alpacaConnection) {
     if (alpacaConnection.connected) {
@@ -41,8 +41,8 @@ function alpacaAuthenticate(alpacaConnection) {
     if (alpacaConnection.connected) {
         alpacaConnection.sendUTF(JSON.stringify({
             "action": "auth",
-            "key": "PKSA68V03CHK099ROVW6",
-            "secret": "J99obitvDvxc9qWknhYFcOmQyqsxCsbwLdd1sAZ4",
+            "key": process.env.ALPACA_KEY,
+            "secret": process.env.ALPACA_SECRET,
         }));
     }
 }
@@ -78,8 +78,11 @@ alpacaClient.on("connect", (alpacaConnection) => {
 alpacaClient.connect(alpacaWssUrl);
 
 function originIsAllowed(origin) {
-    // put logic here to detect whether the specified origin is allowed.
-    return true;
+    return (
+        process.env.CORS_ORIGINS ?
+        process.env.CORS_ORIGINS.split(",").includes(origin) :
+        false
+    );
 }
 
 wsServer.on("request", function(request) {
