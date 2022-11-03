@@ -4,6 +4,7 @@ services:
   all-in-api:
     container_name: all-in-api-prod
     image: all-in-api-prod:latest
+    env_file: .env
     networks:
       - proxy
     volumes:
